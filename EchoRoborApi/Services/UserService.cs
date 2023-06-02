@@ -2,8 +2,16 @@
 using EchoRoborApi.Models;
 using EchoRoborApi.Models.Request.User;
 using EchoRoborApi.Services.Interfaces;
+using EchoRobotApi.Models;
+using EchoRobotApi.Models.Common;
+using EchoRobotApi.Models.Request.User;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace EchoRoborApi.Services
 {
@@ -12,6 +20,15 @@ namespace EchoRoborApi.Services
 
         private readonly EchoRobotContext _context = new ();
         private readonly IMultimediaService _multimediaService = new MultimediaService();
+
+        private readonly AppSettings _appSettings;
+
+        public UserService(IOptions<AppSettings> appSettings)
+        {
+            _appSettings = appSettings.Value;
+        }
+
+
         public ResponseModel AddUser(UserRequest userRequest)
         {
             ResponseModel response = new();
@@ -87,6 +104,20 @@ namespace EchoRoborApi.Services
             }
             return response;
         }
+
+        public async Task<UserResponse> Logging(LoggingRequest request)
+        {
+            var user = await _context.Usuarios.Where(d => d.Email == request.Email && d.Password == request.Password).FirstOrDefaultAsync();
+            var response = new UserResponse();
+
+            if (user == null) return null;
+
+            response.Email = user.Email;
+            response.Token = GetToken(user);
+
+            return response;
+        }
+
         public async Task<ResponseModel> UploadPhotoUser(UserPhotoRequest request)
         {
             ResponseModel response = new ResponseModel();
@@ -118,6 +149,27 @@ namespace EchoRoborApi.Services
                 response.Exito = 0;
             }
             return response;
+        }
+        private string GetToken(Usuario usuario)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var llave = Encoding.ASCII.GetBytes(_appSettings.Secreto);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
+                        new Claim(ClaimTypes.Email, usuario.Email.ToString())
+                    }
+                    ),
+                Expires = DateTime.Now.AddDays(5),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(llave), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
     }

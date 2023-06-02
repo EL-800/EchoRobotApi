@@ -2,6 +2,8 @@
 using EchoRoborApi.Models.Request;
 using EchoRoborApi.Models.Request.User;
 using EchoRoborApi.Services.Interfaces;
+using EchoRobotApi.Models.Request.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +62,36 @@ namespace EchoRoborApi.Controllers
             return BadRequest(response);
         }
 
+        [HttpPost("logging")]
+        public async Task<IActionResult> Logging(LoggingRequest request)
+        {
+            var response = new ResponseModel();
+            var userResponse = await _userService.Logging(request);
+            
+            if(userResponse == null)
+            {
+                response.Exito = 0;
+                response.Mensage = "Credenciales incorrectas";
+                return Unauthorized(response);
+            }
+
+            response.Exito = 1;
+            response.Mensage = "Inicio de sesion correcto";
+            response.Data = userResponse;
+            return Ok(response);
+        }
+
+        [HttpGet("ListUser")]
+        [Authorize]
+        public IActionResult GetUsuario()
+        {
+
+            using (var context = new EchoRobotContext())
+            {
+                var usuario = context.Usuarios.OrderByDescending(d => d.IdUsuario).ToList();
+                return Ok(usuario);
+            }
+        }
     }
 }
 
