@@ -105,6 +105,11 @@ namespace EchoRoborApi.Services
             return response;
         }
 
+        public async Task<Usuario?> GetUser(int id)
+        {
+            return await _context.Usuarios.Where(d=>d.IdUsuario == id).FirstOrDefaultAsync();
+        }
+
         public async Task<UserResponse> Logging(LoggingRequest request)
         {
             var user = await _context.Usuarios.Where(d => d.Email == request.Email && d.Password == request.Password).FirstOrDefaultAsync();
@@ -115,6 +120,7 @@ namespace EchoRoborApi.Services
             response.Nombre = user.Nombre;
             response.Token = GetToken(user);
             response.IdUsuario = user.IdUsuario;
+            response.UrlFoto = user.Foto == null ? "" : user.Foto;
 
             return response;
         }
@@ -135,7 +141,7 @@ namespace EchoRoborApi.Services
 
                 if (!string.IsNullOrEmpty(usuario.Foto)) _multimediaService.DeleteFile(usuario.Foto);
 
-                usuario.Foto = _multimediaService.UploadFile(request.File, usuario.IdUsuario, usuario.Nombre,0);
+                usuario.Foto = await _multimediaService.UploadPhotoUserAsync(request.File.OpenReadStream(), request.IdUsuario.ToString() + usuario.Nombre);
 
                 if (usuario.Foto == null) throw new Exception("Error al subir el archivo");
 

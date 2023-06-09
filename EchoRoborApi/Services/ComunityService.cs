@@ -46,7 +46,8 @@ namespace EchoRoborApi.Services
 
                         multimedia.IdPublicacion = publicacion.IdPublicacion;
 
-                        var image = _multimediaService.UploadFile(elemento, publicacion.IdPublicacion, publicacion.Titulo, 1);
+                        //var image = _multimediaService.UploadFile(elemento, publicacion.IdPublicacion, publicacion.Titulo, 1);
+                        var image = "";
                         if (image == null) throw new Exception("Error al subir un archivo");
 
                         multimedia.Direccion = image;
@@ -126,7 +127,8 @@ namespace EchoRoborApi.Services
 
                         multimedia.IdPublicacion = publication.IdPublicacion;
 
-                        var image = _multimediaService.UploadFile(imagen, publication.IdPublicacion, publication.Titulo, 1);
+                        //var image = _multimediaService.UploadFile(imagen, publication.IdPublicacion, publication.Titulo, 1);
+                        var image = "";
                         if (image == null) throw new Exception("Error al subir un archivo");
 
                         multimedia.Direccion = image;

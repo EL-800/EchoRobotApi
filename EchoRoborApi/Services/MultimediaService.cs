@@ -1,5 +1,7 @@
 ﻿using EchoRoborApi.Services.Interfaces;
-using Microsoft.AspNetCore.Components.Web;
+using Firebase.Auth;
+using Firebase.Auth.Providers;
+using Firebase.Storage;
 using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,8 +10,11 @@ namespace EchoRoborApi.Services
 {
     public class MultimediaService : IMultimediaService
     {
-        private readonly string _PathUser =@"AppData\Usuarios";
-        private readonly string _PathPublication = @"AppData\Publicacion";
+        
+        private readonly string _email = "echorobot@gmail.com";
+        private readonly string _clave = "echorobot";
+        private readonly string _ruta = "echorobot-1e60e.appspot.com";
+        private readonly string _apiKey = "AIzaSyCo2pBTKQy8JHCF9IcJ2e4osZqGB-9H18I";
 
         public string EncryptName(string name)
         {
@@ -18,28 +23,6 @@ namespace EchoRoborApi.Services
             byte[] keyBytes = md5.ComputeHash(nameBytes);
             return BitConverter.ToString(keyBytes).Replace("-", "").ToLower();
 
-        }
-        public string UploadFile(IFormFile file, int id, string name, int place)
-        {
-            try
-            {
-                string ruta = place == 0? _PathUser : _PathPublication;
-
-                int lastIndex = file.FileName.LastIndexOf(".");
-                string extension = file.FileName.Substring(lastIndex);
-
-                string rutaDocumento = Path.Combine(ruta, EncryptName(file.FileName + id + name)+Path.GetExtension(file.FileName).ToLower());
-                using (FileStream newFile = File.Create(rutaDocumento + extension))
-                {
-                    file.CopyTo(newFile);
-                    newFile.Flush();
-                }
-                return rutaDocumento ;
-            }
-            catch (Exception)
-            {
-                return null;
-            };
         }
         public bool DeleteFile(string path)
         {
@@ -66,6 +49,33 @@ namespace EchoRoborApi.Services
             if (extension.Equals(".mp4") || extension.Equals(".m4a")) return true;
 
             return false;
+        }
+
+        public async Task<string> UploadPhotoUserAsync(Stream file, string name)
+        {
+            var config = new FirebaseAuthConfig
+            {
+                ApiKey = _apiKey,
+                AuthDomain = "localhost",
+                Providers = new FirebaseAuthProvider[]
+                {
+                    new EmailProvider()
+                }
+            };
+            var client = new FirebaseAuthClient(config);
+            var userCredential = await client.SignInWithEmailAndPasswordAsync(_email, _clave);
+            
+            var cancellation = new CancellationTokenSource();
+
+            var task = new FirebaseStorage(_ruta, new FirebaseStorageOptions
+            {
+                AuthTokenAsyncFactory = () => userCredential.User.GetIdTokenAsync(),
+                ThrowOnCancel = true
+            }).Child("UserPhotos").Child(name).PutAsync(file, cancellation.Token);
+
+            var downloadUrl = await task;
+
+            return downloadUrl;
         }
     }
 }

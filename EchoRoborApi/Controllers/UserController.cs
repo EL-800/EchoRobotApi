@@ -67,8 +67,8 @@ namespace EchoRoborApi.Controllers
         {
             var response = new ResponseModel();
             var userResponse = await _userService.Logging(request);
-            
-            if(userResponse == null)
+
+            if (userResponse == null)
             {
                 response.Exito = 0;
                 response.Mensage = "Credenciales incorrectas";
@@ -93,20 +93,6 @@ namespace EchoRoborApi.Controllers
             }
         }
 
-        [HttpGet("userPhoto")]
-        [Authorize]
-        public async Task<IActionResult> GetPhoto(int id)
-        {
-            var responseModel = await _userService.GetUserPhoto(id);
-
-            if(responseModel.Exito == 1 || responseModel.Exito == 2)
-                return Ok(responseModel);
-
-            else 
-                return BadRequest(responseModel);
-            
-
-        }
-    }
+    } 
 }
 

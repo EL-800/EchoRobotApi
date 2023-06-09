@@ -15,6 +15,7 @@ namespace EchoRoborApi.Services.Interfaces
         public Task<ResponseModel> UploadPhotoUser(UserPhotoRequest request);
 
         public Task<UserResponse> Logging(LoggingRequest request); 
+        public Task<Usuario?> GetUser(int id);
 
     }
 }
