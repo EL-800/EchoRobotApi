@@ -1,7 +1,9 @@
 ﻿using EchoRoborApi.Models;
 using EchoRoborApi.Models.Request.Comunity;
 using EchoRoborApi.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 using System.Xml.Linq;
 
 namespace EchoRoborApi.Services
@@ -145,7 +147,5 @@ namespace EchoRoborApi.Services
             }
                 return response;
         }
-
     }
-
 }

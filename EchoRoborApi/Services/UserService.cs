@@ -112,8 +112,9 @@ namespace EchoRoborApi.Services
 
             if (user == null) return null;
 
-            response.Email = user.Email;
+            response.Nombre = user.Nombre;
             response.Token = GetToken(user);
+            response.IdUsuario = user.IdUsuario;
 
             return response;
         }
@@ -171,6 +172,5 @@ namespace EchoRoborApi.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-
     }
 }

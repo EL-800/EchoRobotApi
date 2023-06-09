@@ -14,7 +14,7 @@ namespace EchoRoborApi.Services.Interfaces
         public ResponseModel DeleteUser(int id);
         public Task<ResponseModel> UploadPhotoUser(UserPhotoRequest request);
 
-        public Task<UserResponse> Logging(LoggingRequest request);
+        public Task<UserResponse> Logging(LoggingRequest request); 
 
     }
 }

@@ -92,6 +92,21 @@ namespace EchoRoborApi.Controllers
                 return Ok(usuario);
             }
         }
+
+        [HttpGet("userPhoto")]
+        [Authorize]
+        public async Task<IActionResult> GetPhoto(int id)
+        {
+            var responseModel = await _userService.GetUserPhoto(id);
+
+            if(responseModel.Exito == 1 || responseModel.Exito == 2)
+                return Ok(responseModel);
+
+            else 
+                return BadRequest(responseModel);
+            
+
+        }
     }
 }
 

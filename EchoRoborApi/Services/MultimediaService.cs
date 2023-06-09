@@ -28,13 +28,13 @@ namespace EchoRoborApi.Services
                 int lastIndex = file.FileName.LastIndexOf(".");
                 string extension = file.FileName.Substring(lastIndex);
 
-                string rutaDocumento = Path.Combine(ruta, EncryptName(file.FileName + id + name));
+                string rutaDocumento = Path.Combine(ruta, EncryptName(file.FileName + id + name)+Path.GetExtension(file.FileName).ToLower());
                 using (FileStream newFile = File.Create(rutaDocumento + extension))
                 {
                     file.CopyTo(newFile);
                     newFile.Flush();
                 }
-                return rutaDocumento;
+                return rutaDocumento ;
             }
             catch (Exception)
             {

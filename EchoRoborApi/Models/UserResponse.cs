@@ -2,7 +2,8 @@
 {
     public class UserResponse
     {
-        public string Email { get; set; } = "";
+        public string Nombre { get; set; } = "";
         public string Token { get; set; } = "";
+        public int IdUsuario { get; set; }
     }
 }
