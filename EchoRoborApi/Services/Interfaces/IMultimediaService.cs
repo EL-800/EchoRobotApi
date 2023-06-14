@@ -10,5 +10,6 @@ namespace EchoRoborApi.Services.Interfaces
         public bool isVideo(IFormFile file);
 
         public Task<string> UploadPhotoUserAsync(Stream file, string name);
+        public Task<string> UploadFilePublicationAsync(Stream file, string name , int id);
     }
 }

@@ -172,7 +172,8 @@ namespace EchoRoborApi.Services
                         new Claim(ClaimTypes.Email, usuario.Email.ToString())
                     }
                     ),
-                Expires = DateTime.Now.AddDays(5),
+                Expires = DateTime.Now.AddDays(30),
+                NotBefore = DateTime.Now,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(llave), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

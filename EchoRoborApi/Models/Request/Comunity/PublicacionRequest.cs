@@ -11,6 +11,7 @@ namespace EchoRoborApi.Models.Request.Comunity
         [Required]
         public string? Descripcion { get; set; }
 
+        [Required]
         public ICollection<IFormFile> Elementos { get; set; } = new List<IFormFile>();
     }
 }

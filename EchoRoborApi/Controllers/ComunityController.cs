@@ -2,6 +2,7 @@
 using EchoRoborApi.Models;
 using EchoRoborApi.Models.Request.Comunity;
 using EchoRoborApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -20,11 +21,11 @@ namespace EchoRoborApi.Controllers
         }
 
         [HttpPost("AddPublication")]
-        public IActionResult Add([FromForm]PublicacionRequest request)
+        public async Task<IActionResult> Add([FromForm]PublicacionRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState + "Datos incorrectos");
 
-            var response = _conmunity.AddPublicacion(request);
+            var response =await _conmunity.AddPublicacion(request);
 
             if (response.Exito == 0) return BadRequest(response);
             else return Ok(response);
@@ -51,6 +52,14 @@ namespace EchoRoborApi.Controllers
         public IActionResult AddComentario([FromBody] AddComentarioModel request)
         {
             throw new NotImplementedException();
+        }
+
+        [HttpGet("Publicaciones")]
+        public async Task<IActionResult> ListarPublicaciones()
+        {
+            var response = await _conmunity.ListPublication();
+            if (response.Exito == 0) return BadRequest(response);
+            else return Ok(response);
         }
     }
 }

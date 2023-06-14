@@ -10,7 +10,7 @@ namespace EchoRoborApi.Services
 {
     public class MultimediaService : IMultimediaService
     {
-        
+
         private readonly string _email = "echorobot@gmail.com";
         private readonly string _clave = "echorobot";
         private readonly string _ruta = "echorobot-1e60e.appspot.com";
@@ -64,7 +64,7 @@ namespace EchoRoborApi.Services
             };
             var client = new FirebaseAuthClient(config);
             var userCredential = await client.SignInWithEmailAndPasswordAsync(_email, _clave);
-            
+
             var cancellation = new CancellationTokenSource();
 
             var task = new FirebaseStorage(_ruta, new FirebaseStorageOptions
@@ -72,6 +72,32 @@ namespace EchoRoborApi.Services
                 AuthTokenAsyncFactory = () => userCredential.User.GetIdTokenAsync(),
                 ThrowOnCancel = true
             }).Child("UserPhotos").Child(name).PutAsync(file, cancellation.Token);
+
+            var downloadUrl = await task;
+
+            return downloadUrl;
+        }
+        public async Task<string> UploadFilePublicationAsync(Stream file, string name , int id)
+        {
+            var config = new FirebaseAuthConfig
+            {
+                ApiKey = _apiKey,
+                AuthDomain = "localhost",
+                Providers = new FirebaseAuthProvider[]
+                {
+                    new EmailProvider()
+                }
+            };
+            var client = new FirebaseAuthClient(config);
+            var userCredential = await client.SignInWithEmailAndPasswordAsync(_email, _clave);
+
+            var cancellation = new CancellationTokenSource();
+
+            var task = new FirebaseStorage(_ruta, new FirebaseStorageOptions
+            {
+                AuthTokenAsyncFactory = () => userCredential.User.GetIdTokenAsync(),
+                ThrowOnCancel = true
+            }).Child("Comunity").Child(id.ToString()).Child(EncryptName(name+id + new Random().Next(1000000))).PutAsync(file, cancellation.Token);
 
             var downloadUrl = await task;
 

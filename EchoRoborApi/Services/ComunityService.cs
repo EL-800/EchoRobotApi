@@ -4,6 +4,7 @@ using EchoRoborApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace EchoRoborApi.Services
@@ -20,7 +21,56 @@ namespace EchoRoborApi.Services
             throw new NotImplementedException();
         }
 
-        public ResponseModel AddPublicacion(PublicacionRequest request)
+        public async Task<ResponseModel> ListPublication()
+        {
+            var response = new ResponseModel();
+            try
+            {
+                int registrosCount = 10;
+                var list = await (from p in _context.Publicacions
+                                  select
+                                  new {
+                                      idPublicacion = p.IdPublicacion,
+                                      titulo = p.Titulo,
+                                      descripcion = p.Descripcion,
+                                      fechaPublicacion = p.FechaPublicacion,
+                                      numComentarios = _context.Comentarios.Where(e => e.IdPublicacion == p.IdPublicacion).Count(),
+                                      nombreAutor = _context.Usuarios.Where(e => e.IdUsuario == p.IdAutor).FirstOrDefault().Nombre
+                                  })
+                                  .Take(registrosCount).ToListAsync();
+                response.Exito = 1;
+                response.Mensage = "";
+                response.Data = list;
+            }
+            catch (Exception ex)
+            {
+
+                response.Exito =0;
+                response.Mensage = ex.Message;
+            }
+            return response;
+        }
+        public async Task<ResponseModel> ListTopPublication()
+        {
+            var response = new ResponseModel();
+            try
+            {
+                var list = "";
+                response.Exito = 1;
+                response.Mensage = "";
+                response.Data = list;
+            }
+            catch (Exception ex)
+            {
+
+                response.Exito = 0;
+                response.Mensage = ex.Message;
+            }
+            return response;
+        }
+
+
+        public async Task<ResponseModel> AddPublicacion(PublicacionRequest request)
         {
             ResponseModel response = new ResponseModel();
             using (var transaction = _context.Database.BeginTransaction())
@@ -47,7 +97,8 @@ namespace EchoRoborApi.Services
                         multimedia.IdPublicacion = publicacion.IdPublicacion;
 
                         //var image = _multimediaService.UploadFile(elemento, publicacion.IdPublicacion, publicacion.Titulo, 1);
-                        var image = "";
+                        var image = await _multimediaService.UploadFilePublicationAsync(elemento.OpenReadStream(), elemento.Name, publicacion.IdPublicacion);
+                        
                         if (image == null) throw new Exception("Error al subir un archivo");
 
                         multimedia.Direccion = image;
