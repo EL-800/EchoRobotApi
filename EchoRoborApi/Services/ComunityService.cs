@@ -1,4 +1,5 @@
-﻿using EchoRoborApi.Models;
+﻿using Azure;
+using EchoRoborApi.Models;
 using EchoRoborApi.Models.Request.Comunity;
 using EchoRoborApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,27 @@ namespace EchoRoborApi.Services
 
         public ResponseModel AddComentario(AddComentarioModel request)
         {
-            throw new NotImplementedException();
+            var response = new ResponseModel();
+            try
+            {
+                var comentario = new Comentario();
+                comentario.Descripcion = request.Descripcion;
+                comentario.IdPublicacion = request.IdPublicacion;
+                comentario.IdAutor = request.IdAutor;
+                comentario.FechaPublicacion = DateTime.Now;
+                _context.Comentarios.Add(comentario);
+                _context.SaveChanges();
+
+                response.Exito = 1;
+                response.Data = "Comentario agregado con exito";
+            }
+            catch (Exception ex)
+            {
+
+                response.Exito = 0;
+                response.Mensage = ex.Message;
+            }
+            return response; 
         }
 
         public async Task<ResponseModel> ListPublication()
@@ -199,6 +220,61 @@ namespace EchoRoborApi.Services
                 }
             }
                 return response;
+        }
+
+        public async Task<ResponseModel> GetPublication(int id)
+        {
+            var response = new ResponseModel();
+
+            try
+            {/*
+                var publication = await _context.Publicacions.Where(x => x.IdPublicacion == id).FirstOrDefaultAsync();
+                if (publication == null) throw new Exception("Not found");
+                var multimedia = (from d in _context.Multimedia where d.IdPublicacion == publication.IdPublicacion select d.Direccion);
+                var comentarios = (from d in _context.Comentarios
+                                  where d.IdPublicacion == publication.IdPublicacion
+                                  select new
+                                  {
+                                      autor = (from e in _context.Usuarios where e.IdUsuario == d.IdAutor select e.Nombre),
+                                      fecha = d.FechaPublicacion,
+                                      comentario = d.Descripcion
+                                  }).ToList();
+                publication.Comentarios = comentarios;*/
+
+                var publicacion = await (from p in _context.Publicacions
+                                         where p.IdPublicacion == id
+                                         select new
+                                         {
+                                             idPublicacion = p.IdPublicacion,
+                                             titulo = p.Titulo,
+                                             nombre = (from a in _context.Usuarios where a.IdUsuario == p.IdAutor select a.Nombre).FirstOrDefault(),
+                                             apellido = (from a in _context.Usuarios where a.IdUsuario == p.IdAutor select a.Apellido).FirstOrDefault(),
+                                             foto = (from a in _context.Usuarios where a.IdUsuario == p.IdAutor select a.Foto).FirstOrDefault(),
+                                             fecha = p.FechaPublicacion,
+                                             descripcion = p.Descripcion,
+                                             multimedia = (from m in _context.Multimedia
+                                                           where m.IdPublicacion == p.IdPublicacion select m.Direccion).ToList(),
+                                             comentarios = (from c in _context.Comentarios
+                                                           where c.IdPublicacion == p.IdPublicacion
+                                                           select new
+                                                           {
+                                                               nombre = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Nombre).FirstOrDefault(),
+                                                               apellido = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Apellido).FirstOrDefault(),
+                                                               foto = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Foto).FirstOrDefault(),
+                                                               fecha = c.FechaPublicacion,
+                                                               comentario = c.Descripcion
+                                                           }).ToList()
+                                         }).FirstOrDefaultAsync();
+
+                response.Exito = 1;
+                response.Data = publicacion;
+            }
+            catch (Exception ex)
+            {
+                response.Exito = 0;
+                response.Mensage = ex.Message;
+            }
+            return response; 
         }
     }
 }

@@ -14,6 +14,8 @@ namespace EchoRoborApi.Services.Interfaces
         public Task<ResponseModel> ListTopPublication();
         public Task<ResponseModel> ListPublication();
 
+        public Task<ResponseModel> GetPublication(int id);
+
 
     }
 }

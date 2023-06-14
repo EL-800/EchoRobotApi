@@ -51,13 +51,23 @@ namespace EchoRoborApi.Controllers
         [HttpPost("AddComentario")]
         public IActionResult AddComentario([FromBody] AddComentarioModel request)
         {
-            throw new NotImplementedException();
+            var response = _conmunity.AddComentario(request);
+            if (response.Exito == 0) return BadRequest(response);
+            else return Ok(response);
         }
 
         [HttpGet("Publicaciones")]
         public async Task<IActionResult> ListarPublicaciones()
         {
             var response = await _conmunity.ListPublication();
+            if (response.Exito == 0) return BadRequest(response);
+            else return Ok(response);
+        }
+
+        [HttpGet("Publicacion")]
+        public async Task<IActionResult> GetPublication(int id)
+        {
+            var response = await _conmunity.GetPublication(id);
             if (response.Exito == 0) return BadRequest(response);
             else return Ok(response);
         }
