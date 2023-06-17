@@ -49,7 +49,7 @@ namespace EchoRoborApi.Controllers
         }
 
         [HttpPost("AddComentario")]
-        public IActionResult AddComentario([FromBody] AddComentarioModel request)
+        public IActionResult AddComentario([FromForm] AddComentarioModel request)
         {
             var response = _conmunity.AddComentario(request);
             if (response.Exito == 0) return BadRequest(response);

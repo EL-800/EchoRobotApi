@@ -56,7 +56,8 @@ namespace EchoRoborApi.Services
                                       descripcion = p.Descripcion,
                                       fechaPublicacion = p.FechaPublicacion,
                                       numComentarios = _context.Comentarios.Where(e => e.IdPublicacion == p.IdPublicacion).Count(),
-                                      nombreAutor = _context.Usuarios.Where(e => e.IdUsuario == p.IdAutor).FirstOrDefault().Nombre
+                                      nombreAutor = _context.Usuarios.Where(e => e.IdUsuario == p.IdAutor).FirstOrDefault().Nombre,
+                                      foto = _context.Multimedia.Where(e=>e.IdPublicacion == p.IdPublicacion).First().Direccion,
                                   })
                                   .Take(registrosCount).ToListAsync();
                 response.Exito = 1;
@@ -252,6 +253,7 @@ namespace EchoRoborApi.Services
                                              foto = (from a in _context.Usuarios where a.IdUsuario == p.IdAutor select a.Foto).FirstOrDefault(),
                                              fecha = p.FechaPublicacion,
                                              descripcion = p.Descripcion,
+                                             idAutor = p.IdAutor,
                                              multimedia = (from m in _context.Multimedia
                                                            where m.IdPublicacion == p.IdPublicacion select m.Direccion).ToList(),
                                              comentarios = (from c in _context.Comentarios

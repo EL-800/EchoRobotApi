@@ -121,6 +121,7 @@ namespace EchoRoborApi.Services
             response.Token = GetToken(user);
             response.IdUsuario = user.IdUsuario;
             response.UrlFoto = user.Foto == null ? "" : user.Foto;
+            response.Apellido = user.Apellido;
 
             return response;
         }
