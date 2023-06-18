@@ -1,11 +1,9 @@
-﻿using Azure;
-using EchoRoborApi.Models;
+﻿using EchoRoborApi.Models;
 using EchoRoborApi.Models.Request.User;
 using EchoRoborApi.Services.Interfaces;
 using EchoRobotApi.Models;
 using EchoRobotApi.Models.Common;
 using EchoRobotApi.Models.Request.User;
-using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +16,7 @@ namespace EchoRoborApi.Services
     public class UserService : IUserService
     {
 
-        private readonly EchoRobotContext _context = new ();
+        private readonly EchoRobotContext _context = new();
         private readonly IMultimediaService _multimediaService = new MultimediaService();
 
         private readonly AppSettings _appSettings;
@@ -66,7 +64,7 @@ namespace EchoRoborApi.Services
                 _context.SaveChangesAsync();
 
                 response.Exito = 1;
-                response.Mensage= "Usuario Eliminado correctamente";
+                response.Mensage = "Usuario Eliminado correctamente";
             }
             catch (Exception ex)
             {
@@ -78,13 +76,13 @@ namespace EchoRoborApi.Services
 
         public ResponseModel EditUser(EditRequest edit)
         {
-            ResponseModel response = new ();
+            ResponseModel response = new();
             try
             {
 
                 if (edit == null) throw new Exception("Error: Valores no enviados");
 
-                var currentlyUser =  _context.Usuarios.Find(edit.IdUsuario);
+                var currentlyUser = _context.Usuarios.Find(edit.IdUsuario);
 
                 if (currentlyUser == null) throw new Exception("Usuario no encontrado");
 
@@ -107,7 +105,7 @@ namespace EchoRoborApi.Services
 
         public async Task<Usuario?> GetUser(int id)
         {
-            return await _context.Usuarios.Where(d=>d.IdUsuario == id).FirstOrDefaultAsync();
+            return await _context.Usuarios.Where(d => d.IdUsuario == id).FirstOrDefaultAsync();
         }
 
         public async Task<UserResponse> Logging(LoggingRequest request)
@@ -129,7 +127,7 @@ namespace EchoRoborApi.Services
         public async Task<ResponseModel> UploadPhotoUser(UserPhotoRequest request)
         {
             ResponseModel response = new ResponseModel();
-            if(!_multimediaService.isImage(request.File))
+            if (!_multimediaService.isImage(request.File))
             {
                 response.Mensage = "No tiene el formato adecuado";
                 return response;

@@ -21,7 +21,7 @@ namespace EchoRoborApi.Controllers
         }
 
         [HttpPost()]
-        public IActionResult RegisterUser(UserRequest userRequest)
+        public IActionResult RegisterUser([FromForm]UserRequest userRequest)
         {
             if (!ModelState.IsValid) return BadRequest("Datos incorrectos");
 
@@ -63,7 +63,7 @@ namespace EchoRoborApi.Controllers
         }
 
         [HttpPost("logging")]
-        public async Task<IActionResult> Logging(LoggingRequest request)
+        public async Task<IActionResult> Logging([FromForm]LoggingRequest request)
         {
             var response = new ResponseModel();
             var userResponse = await _userService.Logging(request);
