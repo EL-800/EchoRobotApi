@@ -2,6 +2,7 @@
 using EchoRoborApi.Models.Request;
 using EchoRoborApi.Models.Request.User;
 using EchoRoborApi.Services.Interfaces;
+using EchoRobotApi.Models;
 using EchoRobotApi.Models.Request.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

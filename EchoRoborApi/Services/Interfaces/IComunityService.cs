@@ -7,7 +7,7 @@ namespace EchoRoborApi.Services.Interfaces
     {
         public  Task<ResponseModel> AddPublicacion(PublicacionRequest request);
         public ResponseModel EditPublicacion(EditPublicacion request);
-        public ResponseModel DeletePublicacion(int id , int idUser);
+        public ResponseModel DeletePublicacion(int id);
 
         public ResponseModel AddComentario(AddComentarioModel request);
 

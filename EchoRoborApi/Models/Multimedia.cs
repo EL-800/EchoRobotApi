@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EchoRoborApi.Models;
+namespace EchoRobotApi.Models;
 
 public partial class Multimedia
 {
@@ -9,7 +9,7 @@ public partial class Multimedia
 
     public int? IdPublicacion { get; set; }
 
-    public string Direccion { get; set; }
+    public string? Direccion { get; set; }
 
     public virtual Publicacion? IdPublicacionNavigation { get; set; }
 }

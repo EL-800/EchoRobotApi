@@ -2,11 +2,14 @@
 using EchoRoborApi.Models;
 using EchoRoborApi.Models.Request.Comunity;
 using EchoRoborApi.Services.Interfaces;
+using EchoRobotApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace EchoRoborApi.Services
 {
@@ -128,6 +131,23 @@ namespace EchoRoborApi.Services
                         _context.Multimedia.Add(multimedia);
                         _context.SaveChanges();
                     }
+
+                    
+                    
+
+                    XmlDocument xmlDocument = new XmlDocument();
+                    using (var reader = new StreamReader(request.Proyecto.OpenReadStream(), System.Text.Encoding.UTF8, true))
+                    {
+                        // Carga el contenido del archivo en el XmlDocument
+                        xmlDocument.Load(reader);
+                    }
+                    var proyecto = new Proyecto();
+                    proyecto.IdPublicacion = publicacion.IdPublicacion;
+                    proyecto.Archivo = xmlDocument.InnerXml;
+
+                    _context.Proyectos.Add(proyecto);
+                    _context.SaveChanges();
+
                     transaction.Commit();
                     response.Exito = 1;
                     response.Mensage = "Publicacion agrgada con exito";
@@ -142,13 +162,13 @@ namespace EchoRoborApi.Services
             }
         }
 
-        public ResponseModel DeletePublicacion(int id, int idUser)
+        public ResponseModel DeletePublicacion(int id)
         {
             var response = new ResponseModel();
             try
             {
                 var currentPublicacion = _context.Publicacions.Where(d =>
-                    d.IdPublicacion == id &&  d.IdAutor == idUser
+                    d.IdPublicacion == id
                 ).FirstOrDefault();
 
                 if (currentPublicacion == null) throw new Exception("Publicacion no se pudo eliminar");
@@ -254,18 +274,19 @@ namespace EchoRoborApi.Services
                                              fecha = p.FechaPublicacion,
                                              descripcion = p.Descripcion,
                                              idAutor = p.IdAutor,
+                                             proyecto = (from file in _context.Proyectos where file.IdPublicacion == p.IdPublicacion select file.Archivo).First(),
                                              multimedia = (from m in _context.Multimedia
                                                            where m.IdPublicacion == p.IdPublicacion select m.Direccion).ToList(),
                                              comentarios = (from c in _context.Comentarios
-                                                           where c.IdPublicacion == p.IdPublicacion
-                                                           select new
-                                                           {
-                                                               nombre = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Nombre).FirstOrDefault(),
-                                                               apellido = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Apellido).FirstOrDefault(),
-                                                               foto = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Foto).FirstOrDefault(),
-                                                               fecha = c.FechaPublicacion,
-                                                               comentario = c.Descripcion
-                                                           }).ToList()
+                                                            where c.IdPublicacion == p.IdPublicacion
+                                                            select new
+                                                            {
+                                                                nombre = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Nombre).FirstOrDefault(),
+                                                                apellido = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Apellido).FirstOrDefault(),
+                                                                foto = (from u in _context.Usuarios where u.IdUsuario == c.IdAutor select u.Foto).FirstOrDefault(),
+                                                                fecha = c.FechaPublicacion,
+                                                                comentario = c.Descripcion
+                                                            }).ToList()
                                          }).FirstOrDefaultAsync();
 
                 response.Exito = 1;

@@ -13,5 +13,6 @@ namespace EchoRoborApi.Models.Request.Comunity
 
         [Required]
         public ICollection<IFormFile> Elementos { get; set; } = new List<IFormFile>();
+        public IFormFile? Proyecto { get; set; }
     }
 }

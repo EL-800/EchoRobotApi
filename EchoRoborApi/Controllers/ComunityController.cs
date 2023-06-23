@@ -31,10 +31,10 @@ namespace EchoRoborApi.Controllers
             else return Ok(response);
         }
         [HttpDelete("DeletePublicacion")]
-        public IActionResult DeletePublicacion([FromHeader] int id , int idUsuario)
+        public IActionResult DeletePublicacion(int id )
         {
             
-            var response = _conmunity.DeletePublicacion(id,idUsuario);
+            var response = _conmunity.DeletePublicacion(id);
 
             if (response.Exito == 0) return BadRequest(response);
             else return Ok(response);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace EchoRoborApi.Models;
+namespace EchoRobotApi.Models;
 
 public partial class EchoRobotContext : DbContext
 {
@@ -19,12 +19,14 @@ public partial class EchoRobotContext : DbContext
 
     public virtual DbSet<Multimedia> Multimedia { get; set; }
 
+    public virtual DbSet<Proyecto> Proyectos { get; set; }
+
     public virtual DbSet<Publicacion> Publicacions { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=localhost; Database=EchoRobot; Trusted_Connection=true ; TrustServerCertificate = true");
+        => optionsBuilder.UseSqlServer("server=localhost; database=EchoRobot; Trusted_Connection=true; TrustServerCertificate=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -67,6 +69,22 @@ public partial class EchoRobotContext : DbContext
                 .HasConstraintName("FK_Multimedia_Publicacion");
         });
 
+        modelBuilder.Entity<Proyecto>(entity =>
+        {
+            entity.HasKey(e => e.IdProyecto);
+
+            entity.ToTable("Proyecto");
+
+            entity.Property(e => e.IdProyecto).HasColumnName("idProyecto");
+            entity.Property(e => e.Archivo).HasColumnType("xml");
+            entity.Property(e => e.IdPublicacion).HasColumnName("idPublicacion");
+
+            entity.HasOne(d => d.IdPublicacionNavigation).WithMany(p => p.Proyectos)
+                .HasForeignKey(d => d.IdPublicacion)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Proyecto_Publicacion");
+        });
+
         modelBuilder.Entity<Publicacion>(entity =>
         {
             entity.HasKey(e => e.IdPublicacion);
@@ -89,7 +107,6 @@ public partial class EchoRobotContext : DbContext
 
             entity.HasOne(d => d.IdAutorNavigation).WithMany(p => p.Publicacions)
                 .HasForeignKey(d => d.IdAutor)
-                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Publicacion_Usuario");
         });
 
@@ -109,7 +126,6 @@ public partial class EchoRobotContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("email");
             entity.Property(e => e.Foto)
-                .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("foto");
             entity.Property(e => e.Nombre)
